@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.didi.virtualapk.host'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'org.greenrobot.greendao'
+android {
+    compileSdkVersion rootProject.ext.android["compileSdkVersion"]
+    buildToolsVersion rootProject.ext.android["buildToolsVersion"]
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    defaultConfig {
+        applicationId "com.smarthane.android"
+        minSdkVersion rootProject.ext.android["minSdkVersion"]
+        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        versionCode rootProject.ext.android["versionCode"]
+        versionName rootProject.ext.android["versionName"]
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    signingConfigs {
+        release {
+            storeFile file("../keystore/smarthane.key.jks")
+            storePassword "111111"
+            keyAlias "smarthane"
+            keyPassword "111111"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    greendao {
+        schemaVersion 1
+        daoPackage 'smarthane.greendao.dao'
+        targetGenDir 'src/main/java'
+    }
+}
+apt {
+    arguments {
+        moduleName project.getName()
+    }
+}
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    apt rootProject.ext.dependencies["arouter-compiler"]
+    apt rootProject.ext.dependencies["butterknife-compiler"]
+    apt rootProject.ext.dependencies["dagger2-compiler"]
+    provided rootProject.ext.dependencies["javax.annotation"]
+    compile project(':lib-core')
+}
