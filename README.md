@@ -1,5 +1,5 @@
 
-###  项目基于下面的开源框架
+###  项目基于下面的开源框架搭建的插件化MVP框架
 
 ####  1. VirtualAPK
 - https://github.com/didi/VirtualAPK
