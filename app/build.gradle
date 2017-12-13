@@ -32,17 +32,54 @@ android {
         }
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        //输出apk名称为：渠道名_版本名_时间.apk
+                        def fileName = "app-debug-${variant.productFlavors[0].name}-v${defaultConfig.versionName}-${System.currentTimeMillis()}.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+        }
         release {
             minifyEnabled false
             shrinkResources false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        //输出apk名称为：渠道名_版本名_时间.apk
+                        def fileName = "app-release-${variant.productFlavors[0].name}-v${defaultConfig.versionName}-${System.currentTimeMillis()}.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
         }
     }
     greendao {
         schemaVersion 1
         daoPackage 'smarthane.greendao.dao'
         targetGenDir 'src/main/java'
+    }
+    //////////////////////////////////////////////////
+    // 多渠道/多环境 的不同配置
+    productFlavors {
+        develop {
+            // 每个环境包名不同
+            applicationId "com.smarthane.android.develop"
+        }
+        product {
+            applicationId "com.smarthane.android.product"
+        }
     }
 }
 apt {
@@ -57,4 +94,19 @@ dependencies {
     apt rootProject.ext.dependencies["dagger2-compiler"]
     provided rootProject.ext.dependencies["javax.annotation"]
     compile project(':lib-core')
+}
+
+build {
+    doLast {
+        def dir_release = "${rootDir}/build/host/release"
+        File targetDir = new File(dir_release)
+        if(!targetDir.exists()) {
+            targetDir.mkdirs()
+        }
+        copy {
+            from("${projectDir}/build/outputs/apk")
+            into(dir_release)
+            include("app-release-*.apk")
+        }
+    }
 }
