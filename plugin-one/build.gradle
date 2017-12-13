@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -24,6 +28,6 @@ dependencies {
 }
 virtualApk {
     packageId = 0x6f             // The package id of Resources.
-    targetHost='../app' // The path of application module in host project.
+    targetHost='app' // The path of application module in host project. 单独编译路径为：  ../app  批量打包编译为：app
     applyHostMapping = true      // [Optional] Default value is true.
 }
