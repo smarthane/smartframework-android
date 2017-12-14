@@ -22,3 +22,13 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task zipRelease(type: Zip) {
+    File destDir = file('pack')
+    if(!destDir.exists()) {
+        destDir.mkdir()
+    }
+    from 'build'
+    destinationDir destDir
+    archiveName "release-${System.currentTimeMillis()}.zip"
+}

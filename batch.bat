@@ -3,4 +3,6 @@
 call gradlew.bat clean appRelease -p app
 @ echo "pack project: plugin-one"
 call gradlew.bat clean assemblePlugin -p plugin-one
+@ echo "pack project: zipRelease"
+call gradlew.bat zipRelease
 @ echo.
