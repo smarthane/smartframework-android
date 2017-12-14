@@ -26,8 +26,25 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':lib-core')
 }
+//def VATagetHost = "../app"
+def VATagetHost = "app"
+def dirRelease = "${rootDir}/build/plugin/release"
 virtualApk {
     packageId = 0x6f             // The package id of Resources.
-    targetHost='app' // The path of application module in host project. 单独编译路径为：  ../app  批量打包编译为：app
+    targetHost = VATagetHost // The path of application module in host project. 单独编译路径为：  ../app  批量打包编译为：app
     applyHostMapping = true      // [Optional] Default value is true.
+}
+assemblePlugin.doFirst {
+    delete dirRelease
+}
+assemblePlugin.doLast {
+    File targetDir = new File(dirRelease)
+    if(!targetDir.exists()) {
+        targetDir.mkdirs()
+    }
+    copy {
+        from("${projectDir}/build/outputs/plugin/release")
+        into(dirRelease)
+        include("*.apk")
+    }
 }

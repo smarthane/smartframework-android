@@ -96,9 +96,25 @@ dependencies {
     compile project(':lib-core')
 }
 
-build {
-    doLast {
-        def dir_release = "${rootDir}/build/host/release"
+//assembleRelease.doLast {
+//    def dir_release = "${rootDir}/build/host/release"
+//    File targetDir = new File(dir_release)
+//    if(!targetDir.exists()) {
+//        targetDir.mkdirs()
+//    }
+//    println("appRelease"+dir_release)
+//    copy {
+//        from("${projectDir}/build/outputs/apk")
+//        into(dir_release)
+//        include("app-release-*.apk")
+//    }
+//}
+task appRelease(dependsOn: assembleRelease) {
+    def dir_release = "${rootDir}/build/host/release"
+    doFirst{
+        delete dir_release
+    }
+    doLast{
         File targetDir = new File(dir_release)
         if(!targetDir.exists()) {
             targetDir.mkdirs()
