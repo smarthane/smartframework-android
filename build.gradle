@@ -23,6 +23,18 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+task cleanPackRelease(type: Delete) {
+    delete("${rootDir}/build/plugin/release", "${rootDir}/build/host/release")
+}
+
+task assetsPlugin(type: Copy) {
+    copy {
+        from("${rootDir}/build/plugin/release")
+        into("${rootDir}/app/src/main/assets/plugins")
+        include("*.apk")
+    }
+}
+
 task zipRelease(type: Zip) {
     File destDir = file('pack')
     if(!destDir.exists()) {

@@ -37,32 +37,22 @@ android {
             shrinkResources false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def outputFile = output.outputFile
-                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        //输出apk名称为：渠道名_版本名_时间.apk
-                        def fileName = "app-debug-${variant.productFlavors[0].name}-v${defaultConfig.versionName}-${System.currentTimeMillis()}.apk"
-                        output.outputFile = new File(outputFile.parent, fileName)
-                    }
-                }
-            }
         }
         release {
             minifyEnabled false
             shrinkResources false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def outputFile = output.outputFile
-                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        //输出apk名称为：渠道名_版本名_时间.apk
-                        def fileName = "app-release-${variant.productFlavors[0].name}-v${defaultConfig.versionName}-${System.currentTimeMillis()}.apk"
-                        output.outputFile = new File(outputFile.parent, fileName)
-                    }
-                }
-            }
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        //输出apk名称为：渠道名_版本名_时间.apk
+//                        def fileName = "app-release-${variant.productFlavors[0].name}-v${defaultConfig.versionName}-${System.currentTimeMillis()}.apk"
+//                        output.outputFile = new File(outputFile.parent, fileName)
+//                    }
+//                }
+//            }
         }
     }
     greendao {
@@ -72,15 +62,15 @@ android {
     }
     //////////////////////////////////////////////////
     // 多渠道/多环境 的不同配置
-    productFlavors {
-        develop {
-            // 每个环境包名不同
-            applicationId "com.smarthane.android.develop"
-        }
-        product {
-            applicationId "com.smarthane.android.product"
-        }
-    }
+//    productFlavors {
+//        develop {
+//            // 每个环境包名不同
+//            applicationId "com.smarthane.android.develop"
+//        }
+//        product {
+//            applicationId "com.smarthane.android.product"
+//        }
+//    }
 }
 apt {
     arguments {
@@ -93,6 +83,7 @@ dependencies {
     apt rootProject.ext.dependencies["butterknife-compiler"]
     apt rootProject.ext.dependencies["dagger2-compiler"]
     provided rootProject.ext.dependencies["javax.annotation"]
+    compile rootProject.ext.dependencies["permissiongen"]
     compile project(':lib-core')
 }
 
@@ -122,7 +113,8 @@ task appRelease(dependsOn: assembleRelease) {
         copy {
             from("${projectDir}/build/outputs/apk")
             into(dir_release)
-            include("app-release-*.apk")
+            include("*.apk")
+            exclude("*-unaligned.apk")
         }
     }
 }

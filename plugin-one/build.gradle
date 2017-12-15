@@ -42,9 +42,12 @@ assemblePlugin.doLast {
     if(!targetDir.exists()) {
         targetDir.mkdirs()
     }
-    copy {
-        from("${projectDir}/build/outputs/plugin/release")
-        into(dirRelease)
-        include("*.apk")
+    FileTree tree = fileTree(dir: '/build/outputs/plugin/release', include: '*.apk')
+    tree.each {File file ->
+        copy {
+            from("/build/outputs/plugin/release/"+file.name)
+            into(dirRelease)
+            rename(file.name,"plugin_"+android.defaultConfig.applicationId+"_v"+android.defaultConfig.versionName+".apk")
+        }
     }
 }

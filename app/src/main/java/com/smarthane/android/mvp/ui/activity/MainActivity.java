@@ -1,5 +1,6 @@
 package com.smarthane.android.mvp.ui.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.didi.virtualapk.PluginManager;
 import com.jess.arms.base.BaseActivity;
 import com.jess.arms.di.component.AppComponent;
 
+import com.smarthane.android.app.utils.FileUtil;
 import com.smarthane.android.di.component.DaggerMainComponent;
 import com.smarthane.android.di.module.MainModule;
 import com.smarthane.android.mvp.contract.MainContract;
@@ -27,6 +29,7 @@ import java.io.File;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import kr.co.namee.permissiongen.PermissionGen;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
 
@@ -57,6 +60,21 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
 
     @Override
     public void initData(Bundle savedInstanceState) {
+        PermissionGen.with(this).addRequestCode(100).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request();
+
+        FileUtil.getInstance(this).copyAssetsToSD("plugins", "smarthane_plugins").setFileOperateCallback(new FileUtil.FileOperateCallback() {
+            @Override
+            public void onSuccess() {
+                // TODO: 文件复制成功时，主线程回调
+            }
+
+            @Override
+            public void onFailed(String error) {
+                // TODO: 文件复制失败时，主线程回调
+            }
+        });
+
+
         mPresenter.getGirl();
     }
 
@@ -95,7 +113,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
         if (view.getId() == R.id.btn_open_plugin) {
             boolean load = true;
             if (PluginManager.getInstance(getBaseContext()).getLoadedPlugin("com.smarthane.plugin.one") == null) {
-                load = loadPlugin(getBaseContext(),"plugin1.apk");
+                load = loadPlugin(getBaseContext(),"plugin_com.smarthane.plugin.one_v1.0.0.apk");
             }
             if (load) {
                 Intent intent = new Intent();
@@ -107,7 +125,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
 
     private boolean loadPlugin(Context base, String plugin) {
         PluginManager pluginManager = PluginManager.getInstance(base);
-        File apk = new File(Environment.getExternalStorageDirectory(), plugin);
+        File apk = new File(Environment.getExternalStorageDirectory(),"smarthane_plugins"+File.separator+plugin);
         if (apk.exists()) {
             try {
                 pluginManager.loadPlugin(apk);
