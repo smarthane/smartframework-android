@@ -17,6 +17,7 @@ import com.jess.arms.base.BaseActivity;
 import com.jess.arms.di.component.AppComponent;
 
 import com.smarthane.android.app.utils.FileUtil;
+import com.smarthane.android.app.utils.VirtualAPKUtil;
 import com.smarthane.android.di.component.DaggerMainComponent;
 import com.smarthane.android.di.module.MainModule;
 import com.smarthane.android.mvp.contract.MainContract;
@@ -61,21 +62,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     @Override
     public void initData(Bundle savedInstanceState) {
         PermissionGen.with(this).addRequestCode(100).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request();
-
-        FileUtil.getInstance(this).copyAssetsToSD("plugins", "smarthane_plugins").setFileOperateCallback(new FileUtil.FileOperateCallback() {
-            @Override
-            public void onSuccess() {
-                // TODO: 文件复制成功时，主线程回调
-            }
-
-            @Override
-            public void onFailed(String error) {
-                // TODO: 文件复制失败时，主线程回调
-            }
-        });
-
-
         mPresenter.getGirl();
+        VirtualAPKUtil.initLoadPlugins(this);
     }
 
 
@@ -111,34 +99,18 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainCon
     @OnClick({R.id.btn_open_plugin})
     public void onClick(View view){
         if (view.getId() == R.id.btn_open_plugin) {
-            boolean load = true;
             if (PluginManager.getInstance(getBaseContext()).getLoadedPlugin("com.smarthane.plugin.one") == null) {
-                load = loadPlugin(getBaseContext(),"plugin_com.smarthane.plugin.one_v1.0.0.apk");
+                Toast.makeText(getApplicationContext(), "未检测到插件[com.smarthane.plugin.one]", Toast.LENGTH_SHORT).show();
+                return;
             }
-            if (load) {
-                Intent intent = new Intent();
-                intent.setClassName("com.smarthane.plugin.one", "com.smarthane.plugin.one.SMainActivity");
-                startActivityForResult(intent, 0);
-            }
+            Intent intent = new Intent();
+            intent.setClassName("com.smarthane.plugin.one", "com.smarthane.plugin.one.SMainActivity");
+            startActivityForResult(intent, 0);
         }
     }
 
-    private boolean loadPlugin(Context base, String plugin) {
-        PluginManager pluginManager = PluginManager.getInstance(base);
-        File apk = new File(Environment.getExternalStorageDirectory(),"smarthane_plugins"+File.separator+plugin);
-        if (apk.exists()) {
-            try {
-                pluginManager.loadPlugin(apk);
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "SDcard根目录未检测到"+plugin+"插件", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        } else {
-            Toast.makeText(getApplicationContext(), "SDcard根目录未检测到"+plugin+"插件", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
-
 }

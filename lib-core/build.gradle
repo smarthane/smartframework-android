@@ -37,4 +37,5 @@ dependencies {
     compile rootProject.ext.dependencies["butterknife"]
     compile rootProject.ext.dependencies["dagger2"]
     compile rootProject.ext.dependencies["greendao"]
+    compile rootProject.ext.dependencies["permissiongen"]
 }
